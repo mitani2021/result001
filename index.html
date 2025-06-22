@@ -8,45 +8,56 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body { font-family: sans-serif; padding: 2em; max-width: 800px; margin: auto; background: #fff; }
-    canvas { margin-top: 2em; }
+    canvas { margin: 2em 0; }
     button { margin: 1em 0.5em 0 0; padding: 0.5em 1em; }
   </style>
 </head>
 <body>
   <h1>調査結果</h1>
-  <canvas id="barChart"></canvas>
+  <h2>学園の課題（得票数順）</h2>
+  <canvas id="issueChart"></canvas>
+
+  <h2>支持候補者（得票数順）</h2>
+  <canvas id="candidateChart"></canvas>
+
   <button onclick="resetData()">集計をリセット</button>
 
   <script>
     const data = JSON.parse(localStorage.getItem('responses') || '[]');
-    const issues = {};
 
-    data.forEach(({ issue }) => {
-      issues[issue] = (issues[issue] || 0) + 1;
-    });
+    function getSortedCounts(field) {
+      const counts = {};
+      data.forEach(item => {
+        const key = item[field];
+        counts[key] = (counts[key] || 0) + 1;
+      });
+      return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    }
 
-    const sorted = Object.entries(issues).sort((a, b) => b[1] - a[1]);
-    const labels = sorted.map(([key]) => key);
-    const counts = sorted.map(([, val]) => val);
-
-    new Chart(document.getElementById('barChart'), {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: '得票数',
-          data: counts,
-          backgroundColor: 'red',
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        plugins: {
-          legend: { display: false }
+    function renderChart(canvasId, sortedData, label) {
+      const ctx = document.getElementById(canvasId);
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: sortedData.map(([key]) => key),
+          datasets: [{
+            label: label,
+            data: sortedData.map(([, value]) => value),
+            backgroundColor: 'red'
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          }
         }
-      }
-    });
+      });
+    }
+
+    renderChart('issueChart', getSortedCounts('issue'), '得票数');
+    renderChart('candidateChart', getSortedCounts('candidate'), '得票数');
 
     function resetData() {
       localStorage.removeItem('responses');
