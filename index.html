@@ -1,0 +1,57 @@
+<!-- results.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>調査結果</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 2em; max-width: 800px; margin: auto; background: #fff; }
+    canvas { margin-top: 2em; }
+    button { margin: 1em 0.5em 0 0; padding: 0.5em 1em; }
+  </style>
+</head>
+<body>
+  <h1>調査結果</h1>
+  <canvas id="barChart"></canvas>
+  <button onclick="resetData()">集計をリセット</button>
+
+  <script>
+    const data = JSON.parse(localStorage.getItem('responses') || '[]');
+    const issues = {};
+
+    data.forEach(({ issue }) => {
+      issues[issue] = (issues[issue] || 0) + 1;
+    });
+
+    const sorted = Object.entries(issues).sort((a, b) => b[1] - a[1]);
+    const labels = sorted.map(([key]) => key);
+    const counts = sorted.map(([, val]) => val);
+
+    new Chart(document.getElementById('barChart'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: '得票数',
+          data: counts,
+          backgroundColor: 'red',
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+
+    function resetData() {
+      localStorage.removeItem('responses');
+      alert('集計結果をリセットしました。ページをリロードしてください。');
+    }
+  </script>
+</body>
+</html>
