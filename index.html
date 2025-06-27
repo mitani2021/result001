@@ -2,73 +2,58 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>集計結果</title>
+  <title>調査結果</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    canvas { max-width: 1000px; margin-bottom: 40px; }
+  </style>
 </head>
 <body>
-  <h1>集計結果</h1>
-  <canvas id="issueChart" width="400" height="200"></canvas>
-  <canvas id="candidateChart" width="400" height="200"></canvas>
+  <h1>調査結果</h1>
+  <h2>学園の課題に関する集計</h2>
+  <canvas id="issuesChart"></canvas>
 
-  <button onclick="resetData()">集計リセット</button>
-  <button onclick="exportCSV()">CSVダウンロード</button>
+  <h2>候補者支持の集計</h2>
+  <canvas id="candidatesChart"></canvas>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxGrgHxm0V6VxsPqL18J7wxWE-x_8G7jmEGVh7uhp7Xp7GwfEmcEJBfh2LIEYpXinoA/exec";
-    const resetURL = "https://script.google.com/macros/s/AKfycbxGrgHxm0V6VxsPqL18J7wxWE-x_8G7jmEGVh7uhp7Xp7GwfEmcEJBfh2LIEYpXinoA/exec";
+    const scriptUrl = '<<https://script.google.com/macros/s/AKfycbyBTe2myB78boUWg9VBjzrYERW-ADSqqPSvptmKq8BA9s4X_nT4NBtAaTpZuJRx6CPS/exec>>';
 
-    fetch(scriptURL)
-      .then(res => res.json())
+    fetch(scriptUrl)
+      .then(response => response.json())
       .then(data => {
-        data.shift(); // ヘッダー行を削除
-        const issueCount = {};
-        const candidateCount = {};
+        const issuesCount = {};
+        const candidatesCount = {};
 
-        data.forEach(row => {
-          const issue = row[1];
-          const candidate = row[2];
-          issueCount[issue] = (issueCount[issue] || 0) + 1;
-          candidateCount[candidate] = (candidateCount[candidate] || 0) + 1;
-        });
+        for (let i = 1; i < data.length; i++) {
+          const issue = data[i][1];
+          const candidate = data[i][2];
 
-        drawChart("issueChart", "学園課題", issueCount);
-        drawChart("candidateChart", "候補者支持", candidateCount);
-      });
-
-    function drawChart(id, title, dataObj) {
-      const entries = Object.entries(dataObj).sort((a, b) => b[1] - a[1]);
-      new Chart(document.getElementById(id), {
-        type: 'bar',
-        data: {
-          labels: entries.map(e => e[0]),
-          datasets: [{
-            label: title,
-            data: entries.map(e => e[1]),
-            backgroundColor: "red"
-          }]
-        },
-        options: {
-          indexAxis: 'y'
+          issuesCount[issue] = (issuesCount[issue] || 0) + 1;
+          candidatesCount[candidate] = (candidatesCount[candidate] || 0) + 1;
         }
+
+        function renderChart(canvasId, counts) {
+          const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+          new Chart(document.getElementById(canvasId), {
+            type: 'bar',
+            data: {
+              labels: sorted.map(e => e[0]),
+              datasets: [{
+                label: '得票数',
+                data: sorted.map(e => e[1]),
+                backgroundColor: 'red'
+              }]
+            },
+            options: {
+              indexAxis: 'y'
+            }
+          });
+        }
+
+        renderChart('issuesChart', issuesCount);
+        renderChart('candidatesChart', candidatesCount);
       });
-    }
-
-    function resetData() {
-      fetch(resetURL).then(() => location.reload());
-    }
-
-    function exportCSV() {
-      fetch(scriptURL)
-        .then(res => res.json())
-        .then(data => {
-          let csvContent = data.map(e => e.join(",")).join("\n");
-          let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-          let link = document.createElement("a");
-          link.href = URL.createObjectURL(blob);
-          link.download = "survey_result.csv";
-          link.click();
-        });
-    }
   </script>
 </body>
 </html>
