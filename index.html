@@ -1,67 +1,73 @@
-<!-- results.html -->
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>調査結果</title>
+  <title>集計結果</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body { font-family: sans-serif; padding: 2em; max-width: 800px; margin: auto; background: #fff; }
-    canvas { margin: 2em 0; }
-    button { margin: 1em 0.5em 0 0; padding: 0.5em 1em; }
-  </style>
 </head>
 <body>
-  <h1>第１回世論調査の結果</h1>
-  <h2>学園の課題（得票数順）</h2>
-  <canvas id="issueChart"></canvas>
+  <h1>集計結果</h1>
+  <canvas id="issueChart" width="400" height="200"></canvas>
+  <canvas id="candidateChart" width="400" height="200"></canvas>
 
-  <h2>支持候補者（得票数順）</h2>
-  <canvas id="candidateChart"></canvas>
-
-  <button onclick="resetData()">集計をリセット</button>
+  <button onclick="resetData()">集計リセット</button>
+  <button onclick="exportCSV()">CSVダウンロード</button>
 
   <script>
-    const data = JSON.parse(localStorage.getItem('responses') || '[]');
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxGrgHxm0V6VxsPqL18J7wxWE-x_8G7jmEGVh7uhp7Xp7GwfEmcEJBfh2LIEYpXinoA/exec";
+    const resetURL = "https://script.google.com/macros/s/AKfycbxGrgHxm0V6VxsPqL18J7wxWE-x_8G7jmEGVh7uhp7Xp7GwfEmcEJBfh2LIEYpXinoA/exec";
 
-    function getSortedCounts(field) {
-      const counts = {};
-      data.forEach(item => {
-        const key = item[field];
-        counts[key] = (counts[key] || 0) + 1;
+    fetch(scriptURL)
+      .then(res => res.json())
+      .then(data => {
+        data.shift(); // ヘッダー行を削除
+        const issueCount = {};
+        const candidateCount = {};
+
+        data.forEach(row => {
+          const issue = row[1];
+          const candidate = row[2];
+          issueCount[issue] = (issueCount[issue] || 0) + 1;
+          candidateCount[candidate] = (candidateCount[candidate] || 0) + 1;
+        });
+
+        drawChart("issueChart", "学園課題", issueCount);
+        drawChart("candidateChart", "候補者支持", candidateCount);
       });
-      return Object.entries(counts).sort((a, b) => b[1] - a[1]);
-    }
 
-    function renderChart(canvasId, sortedData, label) {
-      const ctx = document.getElementById(canvasId);
-      new Chart(ctx, {
+    function drawChart(id, title, dataObj) {
+      const entries = Object.entries(dataObj).sort((a, b) => b[1] - a[1]);
+      new Chart(document.getElementById(id), {
         type: 'bar',
         data: {
-          labels: sortedData.map(([key]) => key),
+          labels: entries.map(e => e[0]),
           datasets: [{
-            label: label,
-            data: sortedData.map(([, value]) => value),
-            backgroundColor: 'red'
+            label: title,
+            data: entries.map(e => e[1]),
+            backgroundColor: "red"
           }]
         },
         options: {
-          indexAxis: 'y',
-          responsive: true,
-          plugins: {
-            legend: { display: false }
-          }
+          indexAxis: 'y'
         }
       });
     }
 
-    renderChart('issueChart', getSortedCounts('issue'), '得票数');
-    renderChart('candidateChart', getSortedCounts('candidate'), '得票数');
-
     function resetData() {
-      localStorage.removeItem('responses');
-      alert('集計結果をリセットしました。ページをリロードしてください。');
+      fetch(resetURL).then(() => location.reload());
+    }
+
+    function exportCSV() {
+      fetch(scriptURL)
+        .then(res => res.json())
+        .then(data => {
+          let csvContent = data.map(e => e.join(",")).join("\n");
+          let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+          let link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = "survey_result.csv";
+          link.click();
+        });
     }
   </script>
 </body>
