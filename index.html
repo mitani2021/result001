@@ -1,81 +1,66 @@
+<!-- chart.html -->
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>調査結果</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>三谷学園 世論調査集計</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    canvas {
-      max-width: 800px;
-      margin: 2em auto;
-      display: block;
-    }
-  </style>
 </head>
 <body>
-  <h1>調査結果</h1>
-  <h2>学園の課題に関する得票数</h2>
-  <canvas id="issuesChart"></canvas>
-
-  <h2>候補者支持に関する得票数</h2>
-  <canvas id="candidatesChart"></canvas>
+  <h1>世論調査 結果</h1>
+  <canvas id="issueChart" width="400" height="300"></canvas>
+  <canvas id="candidateChart" width="400" height="300"></canvas>
 
   <script>
-    const scriptUrl = '<<https://script.google.com/macros/s/AKfycbwMoH3hnexzflvqExhNcNIj8vLECZ5K9gzViNxLc6hYyJ5I50mEE2zIZpW6WNGZF27l/exec>>';
-
     async function fetchData() {
-      try {
-        const response = await fetch(scriptUrl, { method: 'GET' });
-        if (!response.ok) throw new Error('データ取得に失敗しました');
-        const data = await response.json();
-        return data;
-      } catch (error) {
-        alert("データ取得に失敗しました。Apps Scriptの設定やURLをご確認ください。");
-        console.error(error);
-        return null;
+      const response = await fetch('https://docs.google.com/spreadsheets/d/AKfycbyJ_6_iz-mtlB025F2W6LJYOmOPcpR8qEqhR4zxuYwUNLjb6gEDXwHlWrITSshPUqAU/gviz/tq?tqx=out:json');
+      const text = await response.text();
+      const json = JSON.parse(text.substr(47).slice(0, -2));
+      const rows = json.table.rows;
+      const issueCount = {};
+      const candidateCount = {};
+      for (const row of rows) {
+        const issue = row.c[1]?.v;
+        const candidate = row.c[2]?.v;
+        if (issue) issueCount[issue] = (issueCount[issue] || 0) + 1;
+        if (candidate) candidateCount[candidate] = (candidateCount[candidate] || 0) + 1;
       }
-    }
 
-    function countVotes(data, index) {
-      const counts = {};
-      for (let i = 1; i < data.length; i++) {
-        const key = data[i][index];
-        if (key) counts[key] = (counts[key] || 0) + 1;
-      }
-      return Object.entries(counts).sort((a, b) => b[1] - a[1]);
-    }
+      const issueData = Object.entries(issueCount).sort((a, b) => b[1] - a[1]);
+      const candidateData = Object.entries(candidateCount).sort((a, b) => b[1] - a[1]);
 
-    function renderChart(canvasId, dataPairs, title) {
-      new Chart(document.getElementById(canvasId), {
+      const issueChart = new Chart(document.getElementById('issueChart'), {
         type: 'bar',
         data: {
-          labels: dataPairs.map(item => item[0]),
+          labels: issueData.map(i => i[0]),
           datasets: [{
-            label: title,
-            data: dataPairs.map(item => item[1]),
-            backgroundColor: 'red'
+            label: '票数',
+            data: issueData.map(i => i[1]),
+            backgroundColor: 'red',
           }]
         },
         options: {
-          indexAxis: 'y',
-          responsive: true,
-          scales: {
-            x: { beginAtZero: true }
-          }
+          indexAxis: 'y'
+        }
+      });
+
+      const candidateChart = new Chart(document.getElementById('candidateChart'), {
+        type: 'bar',
+        data: {
+          labels: candidateData.map(c => c[0]),
+          datasets: [{
+            label: '票数',
+            data: candidateData.map(c => c[1]),
+            backgroundColor: 'red',
+          }]
+        },
+        options: {
+          indexAxis: 'y'
         }
       });
     }
-
-    (async () => {
-      const data = await fetchData();
-      if (!data) return;
-
-      const issuesData = countVotes(data, 1);
-      const candidatesData = countVotes(data, 2);
-
-      renderChart('issuesChart', issuesData, '学園の課題');
-      renderChart('candidatesChart', candidatesData, '候補者支持');
-    })();
+    fetchData();
   </script>
 </body>
 </html>
