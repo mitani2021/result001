@@ -92,6 +92,9 @@
         },
         options: {
           indexAxis: 'y',
+          layout: {
+            padding: { right: 40 } // ラベルのために右余白を少し追加
+          },
           plugins: {
             legend: { display: false },
             datalabels: {
@@ -99,6 +102,7 @@
               font: { size: 16 },
               align: 'end',
               anchor: 'end',
+              clip: false,
               formatter: (value) => value === issueMax ? `🌸 ${value}` : value
             }
           },
@@ -132,6 +136,9 @@
         },
         options: {
           indexAxis: 'y',
+          layout: {
+            padding: { right: 40 }
+          },
           plugins: {
             legend: { display: false },
             datalabels: {
@@ -139,6 +146,7 @@
               font: { size: 16 },
               align: 'end',
               anchor: 'end',
+              clip: false,
               formatter: (value) => value === candidateMax ? `🌸 ${value}` : value
             }
           },
