@@ -80,75 +80,46 @@
       const issueMax = Math.max(...issueData.map(i => i[1]));
       const candidateMax = Math.max(...candidateData.map(c => c[1]));
 
-      new Chart(document.getElementById('issueChart'), {
-        type: 'bar',
-        data: {
-          labels: issueData.map(i => i[0]),
-          datasets: [{
-            data: issueData.map(i => i[1]),
-            backgroundColor: 'red',
-            barThickness: 20
-          }]
-        },
-        options: {
-          indexAxis: 'y',
-          plugins: {
-            legend: { display: false },
-            datalabels: {
-              color: 'white',
-              font: { size: 18 },
-              anchor: 'start',
-              align: 'start',
-              formatter: (value) => value === issueMax ? `🌸 ${value}` : value
+      function createChart(ctx, data, maxValue) {
+        return new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.map(i => i[0]),
+            datasets: [{
+              data: data.map(i => i[1]),
+              backgroundColor: 'red',
+              barThickness: 20
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            plugins: {
+              legend: { display: false },
+              datalabels: {
+                color: 'white',
+                font: { size: 18 },
+                anchor: 'end',
+                align: 'end',
+                clamp: true,
+                formatter: (value) => value === maxValue ? `${value} 🌸` : `${value}`
+              }
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                ticks: { font: { size: 21 }, precision: 0 }
+              },
+              y: {
+                ticks: { font: { size: 21 } }
+              }
             }
           },
-          scales: {
-            x: {
-              beginAtZero: true,
-              ticks: { font: { size: 21 }, precision: 0 }
-            },
-            y: {
-              ticks: { font: { size: 21 } }
-            }
-          }
-        },
-        plugins: [ChartDataLabels]
-      });
+          plugins: [ChartDataLabels]
+        });
+      }
 
-      new Chart(document.getElementById('candidateChart'), {
-        type: 'bar',
-        data: {
-          labels: candidateData.map(c => c[0]),
-          datasets: [{
-            data: candidateData.map(c => c[1]),
-            backgroundColor: 'red',
-            barThickness: 20
-          }]
-        },
-        options: {
-          indexAxis: 'y',
-          plugins: {
-            legend: { display: false },
-            datalabels: {
-              color: 'white',
-              font: { size: 18 },
-              anchor: 'start',
-              align: 'start',
-              formatter: (value) => value === candidateMax ? `🌸 ${value}` : value
-            }
-          },
-          scales: {
-            x: {
-              beginAtZero: true,
-              ticks: { font: { size: 21 }, precision: 0 }
-            },
-            y: {
-              ticks: { font: { size: 21 } }
-            }
-          }
-        },
-        plugins: [ChartDataLabels]
-      });
+      createChart(document.getElementById('issueChart'), issueData, issueMax);
+      createChart(document.getElementById('candidateChart'), candidateData, candidateMax);
     }
 
     fetchData();
