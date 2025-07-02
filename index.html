@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>三谷学園 第1回 世論調査 集計結果</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
   <style>
     body {
       margin: 0;
@@ -76,6 +77,9 @@
       const issueData = Object.entries(issueCount).sort((a, b) => b[1] - a[1]);
       const candidateData = Object.entries(candidateCount).sort((a, b) => b[1] - a[1]);
 
+      const issueMax = Math.max(...issueData.map(i => i[1]));
+      const candidateMax = Math.max(...candidateData.map(c => c[1]));
+
       new Chart(document.getElementById('issueChart'), {
         type: 'bar',
         data: {
@@ -89,23 +93,31 @@
         options: {
           indexAxis: 'y',
           plugins: {
-            legend: { display: false }
+            legend: { display: false },
+            datalabels: {
+              color: '#000',
+              font: { size: 16 },
+              align: 'end',
+              anchor: 'end',
+              formatter: (value) => value === issueMax ? `🌸 ${value}` : value
+            }
           },
           scales: {
             x: {
               beginAtZero: true,
               ticks: {
-                font: { size: 16 },
+                font: { size: 21 },
                 precision: 0
               }
             },
             y: {
               ticks: {
-                font: { size: 16 }
+                font: { size: 21 }
               }
             }
           }
-        }
+        },
+        plugins: [ChartDataLabels]
       });
 
       new Chart(document.getElementById('candidateChart'), {
@@ -121,23 +133,31 @@
         options: {
           indexAxis: 'y',
           plugins: {
-            legend: { display: false }
+            legend: { display: false },
+            datalabels: {
+              color: '#000',
+              font: { size: 16 },
+              align: 'end',
+              anchor: 'end',
+              formatter: (value) => value === candidateMax ? `🌸 ${value}` : value
+            }
           },
           scales: {
             x: {
               beginAtZero: true,
               ticks: {
-                font: { size: 16 },
+                font: { size: 21 },
                 precision: 0
               }
             },
             y: {
               ticks: {
-                font: { size: 16 }
+                font: { size: 21 }
               }
             }
           }
-        }
+        },
+        plugins: [ChartDataLabels]
       });
     }
 
