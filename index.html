@@ -88,11 +88,21 @@
         },
         options: {
           indexAxis: 'y',
-          plugins: { legend: { display: false } },
+          plugins: {
+            legend: { display: false }
+          },
           scales: {
             x: {
-              ticks: { precision: 0 },
-              beginAtZero: true
+              beginAtZero: true,
+              ticks: {
+                font: { size: 16 },
+                precision: 0
+              }
+            },
+            y: {
+              ticks: {
+                font: { size: 16 }
+              }
             }
           }
         }
@@ -110,11 +120,21 @@
         },
         options: {
           indexAxis: 'y',
-          plugins: { legend: { display: false } },
+          plugins: {
+            legend: { display: false }
+          },
           scales: {
             x: {
-              ticks: { precision: 0 },
-              beginAtZero: true
+              beginAtZero: true,
+              ticks: {
+                font: { size: 16 },
+                precision: 0
+              }
+            },
+            y: {
+              ticks: {
+                font: { size: 16 }
+              }
             }
           }
         }
