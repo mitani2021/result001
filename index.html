@@ -8,17 +8,16 @@
     body {
       margin: 0;
       padding: 0;
-      background-color: #eaeaea;
-      font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
-      color: #333;
+      background-color: #f2f2f2;
+      font-family: 'Helvetica Neue', sans-serif;
     }
 
     .container {
-      width: 1000px;
+      width: 960px;
       margin: 60px auto;
-      background-color: #fff;
+      background-color: #ffffff;
       padding: 40px 60px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       border-radius: 10px;
     }
 
@@ -26,21 +25,23 @@
       font-size: 32px;
       margin-bottom: 40px;
       text-align: center;
+      color: #333;
       border-bottom: 2px solid #ccc;
       padding-bottom: 10px;
     }
 
     h2 {
-      font-size: 24px;
-      margin: 40px 0 20px;
+      font-size: 22px;
+      margin: 40px 0 10px;
+      color: #444;
       border-left: 6px solid red;
       padding-left: 10px;
-      color: #444;
     }
 
     canvas {
       width: 100% !important;
-      height: 400px !important;
+      height: auto !important;
+      margin-bottom: 40px;
     }
   </style>
 </head>
@@ -81,19 +82,17 @@
           labels: issueData.map(i => i[0]),
           datasets: [{
             data: issueData.map(i => i[1]),
-            backgroundColor: 'red'
+            backgroundColor: 'red',
+            barThickness: 20
           }]
         },
         options: {
           indexAxis: 'y',
-          plugins: {
-            legend: { display: false }
-          },
+          plugins: { legend: { display: false } },
           scales: {
             x: {
-              ticks: {
-                precision: 0
-              }
+              ticks: { precision: 0 },
+              beginAtZero: true
             }
           }
         }
@@ -105,19 +104,17 @@
           labels: candidateData.map(c => c[0]),
           datasets: [{
             data: candidateData.map(c => c[1]),
-            backgroundColor: 'red'
+            backgroundColor: 'red',
+            barThickness: 20
           }]
         },
         options: {
           indexAxis: 'y',
-          plugins: {
-            legend: { display: false }
-          },
+          plugins: { legend: { display: false } },
           scales: {
             x: {
-              ticks: {
-                precision: 0
-              }
+              ticks: { precision: 0 },
+              beginAtZero: true
             }
           }
         }
