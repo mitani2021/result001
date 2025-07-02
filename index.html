@@ -1,58 +1,54 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>三谷学園 第1回 世論調査 集計結果</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
   <style>
     body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
       margin: 0;
-      padding: 0;
-      background-color: #f2f2f2;
-      font-family: 'Helvetica Neue', sans-serif;
-    }
-
-    .container {
-      width: 960px;
-      margin: 60px auto;
-      background-color: #ffffff;
-      padding: 40px 60px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      border-radius: 10px;
+      padding: 2em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     h1 {
-      font-size: 32px;
-      margin-bottom: 40px;
+      font-size: 2.2em;
+      margin-bottom: 1.5em;
       text-align: center;
       color: #333;
-      border-bottom: 2px solid #ccc;
-      padding-bottom: 10px;
     }
 
-    h2 {
-      font-size: 22px;
-      margin: 40px 0 10px;
-      color: #444;
-      border-left: 6px solid red;
-      padding-left: 10px;
+    .chart-container {
+      width: 90%;
+      max-width: 800px;
+      margin-bottom: 40px;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
     }
 
     canvas {
       width: 100% !important;
       height: auto !important;
-      margin-bottom: 40px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>三谷学園 第1回 世論調査 集計結果</h1>
+  <h1>三谷学園 第1回 世論調査 集計結果</h1>
 
+  <div class="chart-container">
     <h2>最も重要な学園の課題</h2>
     <canvas id="issueChart"></canvas>
+  </div>
 
+  <div class="chart-container">
     <h2>支持する候補者</h2>
     <canvas id="candidateChart"></canvas>
   </div>
@@ -77,40 +73,49 @@
       const issueData = Object.entries(issueCount).sort((a, b) => b[1] - a[1]);
       const candidateData = Object.entries(candidateCount).sort((a, b) => b[1] - a[1]);
 
-      const issueMax = Math.max(...issueData.map(i => i[1]));
-      const candidateMax = Math.max(...candidateData.map(c => c[1]));
-
-      function createChart(ctx, data, maxValue) {
-        return new Chart(ctx, {
+      function createChart(ctx, data, title) {
+        const maxVotes = Math.max(...data.map(d => d[1]));
+        new Chart(ctx, {
           type: 'bar',
           data: {
-            labels: data.map(i => i[0]),
+            labels: data.map(d => d[0]),
             datasets: [{
-              data: data.map(i => i[1]),
+              data: data.map(d => d[1]),
               backgroundColor: 'red',
               barThickness: 20
             }]
           },
           options: {
             indexAxis: 'y',
+            responsive: true,
             plugins: {
               legend: { display: false },
               datalabels: {
-                color: 'white',
-                font: { size: 18 },
                 anchor: 'end',
                 align: 'end',
                 clamp: true,
-                formatter: (value) => value === maxValue ? `${value} 🌸` : `${value}`
+                color: '#fff',
+                font: {
+                  size: 18
+                },
+                formatter: function(value, context) {
+                  const label = context.chart.data.labels[context.dataIndex];
+                  return value + (value === maxVotes ? ' 🌸' : '');
+                }
               }
             },
             scales: {
               x: {
-                beginAtZero: true,
-                ticks: { font: { size: 21 }, precision: 0 }
+                ticks: {
+                  font: { size: 21 },
+                  beginAtZero: true,
+                  precision: 0
+                }
               },
               y: {
-                ticks: { font: { size: 21 } }
+                ticks: {
+                  font: { size: 21 }
+                }
               }
             }
           },
@@ -118,8 +123,8 @@
         });
       }
 
-      createChart(document.getElementById('issueChart'), issueData, issueMax);
-      createChart(document.getElementById('candidateChart'), candidateData, candidateMax);
+      createChart(document.getElementById('issueChart'), issueData, '最も重要な学園の課題');
+      createChart(document.getElementById('candidateChart'), candidateData, '支持する候補者');
     }
 
     fetchData();
