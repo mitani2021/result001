@@ -1,39 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>三谷学園 世論調査集計</title>
+  <title>三谷学園 世論調査 集計結果</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      font-family: "Helvetica Neue", Arial, sans-serif;
-      background-color: #f5f5f5;
       margin: 0;
-      padding: 60px 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      padding: 0;
+      background-color: #eaeaea;
+      font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+      color: #333;
     }
 
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 50px;
-      text-align: center;
-      color: #222;
-    }
-
-    .chart-container {
+    .container {
       width: 1000px;
-      background: white;
-      padding: 30px 40px;
-      margin-bottom: 60px;
+      margin: 60px auto;
+      background-color: #fff;
+      padding: 40px 60px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
       border-radius: 10px;
     }
 
-    .chart-container h2 {
-      font-size: 1.5em;
-      margin-bottom: 20px;
+    h1 {
+      font-size: 32px;
+      margin-bottom: 40px;
+      text-align: center;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin: 40px 0 20px;
+      border-left: 6px solid red;
+      padding-left: 10px;
       color: #444;
     }
 
@@ -44,14 +45,12 @@
   </style>
 </head>
 <body>
-  <h1>三谷学園 世論調査 結果</h1>
+  <div class="container">
+    <h1>三谷学園 世論調査 集計結果</h1>
 
-  <div class="chart-container">
     <h2>最も重要な学園の課題</h2>
     <canvas id="issueChart"></canvas>
-  </div>
 
-  <div class="chart-container">
     <h2>支持する候補者</h2>
     <canvas id="candidateChart"></canvas>
   </div>
@@ -81,19 +80,21 @@
         data: {
           labels: issueData.map(i => i[0]),
           datasets: [{
-            label: '票数',
             data: issueData.map(i => i[1]),
-            backgroundColor: 'red',
+            backgroundColor: 'red'
           }]
         },
         options: {
           indexAxis: 'y',
-          responsive: true,
           plugins: {
             legend: { display: false }
           },
           scales: {
-            x: { ticks: { stepSize: 1, precision: 0 } }
+            x: {
+              ticks: {
+                precision: 0
+              }
+            }
           }
         }
       });
@@ -103,19 +104,21 @@
         data: {
           labels: candidateData.map(c => c[0]),
           datasets: [{
-            label: '票数',
             data: candidateData.map(c => c[1]),
-            backgroundColor: 'red',
+            backgroundColor: 'red'
           }]
         },
         options: {
           indexAxis: 'y',
-          responsive: true,
           plugins: {
             legend: { display: false }
           },
           scales: {
-            x: { ticks: { stepSize: 1, precision: 0 } }
+            x: {
+              ticks: {
+                precision: 0
+              }
+            }
           }
         }
       });
